@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE Learning Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --border2: #484f58;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --teal: #1D9E75;
+    --teal-light: #5DCAA5;
+    --teal-dim: #0F6E56;
+    --amber: #EF9F27;
+    --amber-dim: #BA7517;
+    --red: #E24B4A;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo { width: 36px; height: 36px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2; }
+  .header-text h1 { font-size: 18px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+  .header-text p { font-size: 12px; color: var(--text2); font-family: var(--mono); margin-top: 2px; }
+  .badge { margin-left: auto; background: var(--teal-dim); color: var(--teal-light); font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--teal); white-space: nowrap; }
+
+  .two-col { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .card-header span { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+  .dot.amber { background: var(--amber); }
+  .dot.dim { background: var(--text3); }
+  .card-body { padding: 16px; }
+
+  .profile-field { margin-bottom: 14px; }
+  .profile-field label { display: block; font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 5px; letter-spacing: 0.05em; }
+  .profile-field input, .profile-field select, .profile-field textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: var(--mono); font-size: 12px; padding: 7px 10px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .profile-field input:focus, .profile-field select:focus, .profile-field textarea:focus { border-color: var(--teal); }
+  .profile-field select option { background: var(--bg3); }
+  .profile-field textarea { resize: vertical; min-height: 60px; }
+
+  .roadmap { display: flex; flex-direction: column; gap: 2px; }
+  .phase { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
+  .phase-connector { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; margin-top: 2px; }
+  .phase-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--teal); background: var(--bg2); flex-shrink: 0; }
+  .phase-dot.done { background: var(--teal); }
+  .phase-dot.future { border-color: var(--border2); }
+  .phase-line { width: 2px; background: var(--border); flex: 1; min-height: 20px; margin-top: 2px; }
+  .phase-line.lit { background: var(--teal-dim); }
+  .phase-info { flex: 1; }
+  .phase-label { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--text); }
+  .phase-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .phase-weeks { font-family: var(--mono); font-size: 10px; color: var(--teal); margin-top: 2px; }
+
+  .week-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .week-num { font-family: var(--mono); font-size: 13px; color: var(--text2); margin-right: auto; }
+  .week-num strong { color: var(--teal-light); }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 12px; padding: 7px 14px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn:hover { background: var(--bg3); border-color: var(--teal); color: var(--teal-light); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--teal); border-color: var(--teal); color: #fff; font-weight: 500; }
+  .btn.primary:hover { background: var(--teal-dim); border-color: var(--teal-dim); color: #fff; }
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .output-area { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; min-height: 180px; padding: 16px; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--text2); position: relative; }
+  .output-area.has-content { color: var(--text); }
+  .placeholder { color: var(--text3); font-style: italic; }
+
+  .stream-cursor { display: inline-block; width: 8px; height: 14px; background: var(--teal); margin-left: 2px; animation: blink 1s infinite; vertical-align: middle; }
+  @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+  .week-plan { display: flex; flex-direction: column; gap: 12px; }
+  .day-block { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .day-block h3 { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--teal-light); margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .day-block .task { display: flex; gap: 8px; margin-top: 6px; font-size: 13px; }
+  .task-bullet { color: var(--teal); flex-shrink: 0; margin-top: 1px; }
+  .task-text strong { color: var(--amber); font-weight: 500; }
+
+  .export-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+  .context-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 1.5rem; }
+  .context-panel h2 { font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .ctx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; font-family: var(--mono); font-size: 11px; color: var(--text2); padding: 3px 10px; }
+  .chip.active { border-color: var(--teal); color: var(--teal-light); background: rgba(29,158,117,0.1); }
+
+  .tag-teal { color: var(--teal-light); font-weight: 500; }
+  .tag-amber { color: var(--amber); font-weight: 500; }
+
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .skill-item { display: flex; align-items: center; gap: 8px; }
+  .skill-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
+  .skill-bar { height: 100%; border-radius: 2px; background: var(--teal); }
+  .skill-name { font-family: var(--mono); font-size: 11px; color: var(--text2); width: 90px; flex-shrink: 0; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg2); border: 1px solid var(--teal); border-radius: 8px; color: var(--teal-light); font-family: var(--mono); font-size: 12px; padding: 10px 16px; transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr; }
+  }
+
+  .loading-dots span { display: inline-block; animation: pulse 1.2s infinite; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,80%,100% { opacity: 0.3; } 40% { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="header-text">
+      <h1>EE Learning Planner</h1>
+      <p>// AI-powered path to VLSI &amp; CMOS mastery</p>
+    </div>
+    <div class="badge">v1.0 · beginner</div>
+  </div>
+
+  <div class="context-panel">
+    <h2>Learning context</h2>
+    <div class="ctx-chips" id="ctx-chips">
+      <div class="chip active">📍 Current: Beginner EE</div>
+      <div class="chip active">🎯 Goal: CMOS / VLSI</div>
+      <div class="chip active">⚡ Focus: Digital Logic → HDL</div>
+      <div class="chip active">🛠 Stack: Verilog · VHDL · Cadence</div>
+      <div class="chip">📅 Weekly projects</div>
+      <div class="chip">🔬 Lab simulations</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <div class="card">
+        <div class="card-header"><div class="dot"></div><span>Your Profile</span></div>
+        <div class="card-body">
+          <div class="profile-field">
+            <label>NAME</label>
+            <input type="text" id="p-name" value="EE Student" placeholder="Your name" />
+          </div>
+          <div class="profile-field">
+            <label>CURRENT LEVEL</label>
+            <select id="p-level">
+              <option value="absolute_beginner">Absolute beginner</option>
+              <option value="some_basics" selected>Know basic circuits</option>
+              <option value="intermediate">Intermediate (took courses)</option>
+            </select>
+          </div>
+          <div class="profile-field">
+            <label>HOURS/WEEK AVAILABLE</label>
+            <select id="p-hours">
+              <option value="3">3–5 hrs/week</option>
+              <option value="8" selected>6–10 hrs/week</option>
+              <option value="15">10–20 hrs/week</option>
+            </select>
+          </div>
+          <div class="profile-field">
+            <label>CURRENT WEEK #</label>
+            <input type="number" id="p-week" value="1" min="1" max="104" />
+          </div>
+          <div class="profile-field">
+            <label>ADDITIONAL GOALS</label>
+            <textarea id="p-goals" rows="2" placeholder="e.g. chip design, FPGA, analog circuits...">CMOS, VLSI, Verilog, VHDL, FPGA</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="dot amber"></div><span>Roadmap</span></div>
+        <div class="card-body">
+          <div class="roadmap">
+            <div class="phase">
+              <div class="phase-connector"><div class="phase-dot done"></div><div class="phase-line lit"></div></div>
+              <div class="phase-info"><div class="phase-label">Phase 1 · Foundations</div><div class="phase-sub">Ohm's law, RC/RL, logic gates</div><div class="phase-weeks">Weeks 1–8</div></div>
+            </div>
+            <div class="phase">
+              <div class="phase-connector"><div class="phase-dot"></div><div class="phase-line"></div></div>
+              <div class="phase-info"><div class="phase-label">Phase 2 · Digital Logic</div><div class="phase-sub">Boolean algebra, FSM, flip-flops</div><div class="phase-weeks">Weeks 9–20</div></div>
+            </div>
+            <div class="phase">
+              <div class="phase-connector"><div class="phase-dot future"></div><div class="phase-line"></div></div>
+              <div class="phase-info"><div class="phase-label">Phase 3 · HDL Programming</div><div class="phase-sub">Verilog, VHDL, simulation</div><div class="phase-weeks">Weeks 21–36</div></div>
+            </div>
+            <div class="phase">
+              <div class="phase-connector"><div class="phase-dot future"></div><div class="phase-line"></div></div>
+              <div class="phase-info"><div class="phase-label">Phase 4 · FPGA &amp; VLSI</div><div class="phase-sub">Synthesis, place &amp; route, timing</div><div class="phase-weeks">Weeks 37–56</div></div>
+            </div>
+            <div class="phase">
+              <div class="phase-connector"><div class="phase-dot future"></div></div>
+              <div class="phase-info"><div class="phase-label">Phase 5 · CMOS Design</div><div class="phase-sub">Transistor-level, Cadence, tape-out</div><div class="phase-weeks">Weeks 57–80</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="dot dim"></div><span>Skill Tracker</span></div>
+        <div class="card-body">
+          <div class="skills-grid">
+            <div class="skill-item"><div class="skill-name">Circuit basics</div><div class="skill-bar-bg"><div class="skill-bar" style="width:15%"></div></div></div>
+            <div class="skill-item"><div class="skill-name">Digital logic</div><div class="skill-bar-bg"><div class="skill-bar" style="width:5%"></div></div></div>
+            <div class="skill-item"><div class="skill-name">Verilog</div><div class="skill-bar-bg"><div class="skill-bar" style="width:0%"></div></div></div>
+            <div class="skill-item"><div class="skill-name">VHDL</div><div class="skill-bar-bg"><div class="skill-bar" style="width:0%"></div></div></div>
+            <div class="skill-item"><div class="skill-name">FPGA flow</div><div class="skill-bar-bg"><div class="skill-bar" style="width:0%"></div></div></div>
+            <div class="skill-item"><div class="skill-name">CMOS</div><div class="skill-bar-bg"><div class="skill-bar" style="width:0%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <div class="card">
+        <div class="card-header"><div class="dot"></div><span>Weekly Project Generator</span></div>
+        <div class="card-body">
+          <div class="week-controls">
+            <div class="week-num">Week <strong id="display-week">1</strong> of 80</div>
+            <button class="btn" onclick="changeWeek(-1)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="btn" onclick="changeWeek(1)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+            <button class="btn primary" onclick="generatePlan()" id="gen-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Generate Week
+            </button>
+          </div>
+
+          <div class="output-area" id="output">
+            <span class="placeholder">Click "Generate Week" to get your personalized weekly project plan with daily breakdowns, tools to use, and learning objectives.</span>
+          </div>
+
+          <div class="export-row" id="export-row" style="display:none">
+            <button class="btn" onclick="exportCalendar()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Export to Google Calendar
+            </button>
+            <button class="btn" onclick="exportDocs()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Export to Google Docs
+            </button>
+            <button class="btn" onclick="copyContext()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy AI Context
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="tips-card">
+        <div class="card-header"><div class="dot amber"></div><span>Tools &amp; Resources for Your Path</span></div>
+        <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:6px;">SIMULATION</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.8;">• Falstad Circuit Sim<br>• LTspice (analog)<br>• Logisim-Evolution<br>• Icarus Verilog</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--teal);margin-bottom:6px;">HDL TOOLS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.8;">• ModelSim / QuestaSim<br>• Vivado (Xilinx)<br>• Quartus (Intel/Altera)<br>• Yosys (open-source)</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:6px;">LEARNING</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.8;">• MIT OCW 6.004<br>• nand2tetris.org<br>• HDLBits (Verilog)<br>• Coursera VLSI</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:6px;">HARDWARE</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.8;">• Arduino (start)<br>• Breadboard kit<br>• Basys3 FPGA board<br>• Raspberry Pi</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentWeek = 1;
+let lastPlanText = '';
+let lastPlanStructured = null;
+
+function changeWeek(dir) {
+  const wInput = document.getElementById('p-week');
+  currentWeek = Math.max(1, Math.min(80, currentWeek + dir));
+  wInput.value = currentWeek;
+  document.getElementById('display-week').textContent = currentWeek;
+}
+
+document.getElementById('p-week').addEventListener('change', function() {
+  currentWeek = Math.max(1, Math.min(80, parseInt(this.value) || 1));
+  this.value = currentWeek;
+  document.getElementById('display-week').textContent = currentWeek;
+});
+
+function getPhase(week) {
+  if (week <= 8) return { phase: 1, name: 'Foundations', topics: 'basic electronics, Ohm\'s law, RC/RL circuits, Kirchhoff\'s laws, oscilloscope use, simple LED/resistor circuits, diodes, intro to transistors' };
+  if (week <= 20) return { phase: 2, name: 'Digital Logic', topics: 'logic gates, Boolean algebra, combinational circuits, multiplexers, decoders, flip-flops, counters, finite state machines, timing diagrams' };
+  if (week <= 36) return { phase: 3, name: 'HDL Programming', topics: 'Verilog syntax, VHDL syntax, module instantiation, testbenches, behavioral vs structural modeling, simulation debugging' };
+  if (week <= 56) return { phase: 4, name: 'FPGA & VLSI', topics: 'FPGA architecture, synthesis, place & route, timing analysis, Vivado/Quartus workflow, RTL design, pipelining, memory interfaces' };
+  return { phase: 5, name: 'CMOS Design', topics: 'MOSFET physics, CMOS gates, transistor sizing, static timing, Cadence Virtuoso, parasitic extraction, DRC, LVS, tape-out flow' };
+}
+
+function buildSystemPrompt() {
+  const name = document.getElementById('p-name').value || 'Student';
+  const level = document.getElementById('p-level').value;
+  const hours = document.getElementById('p-hours').value;
+  const goals = document.getElementById('p-goals').value;
+  const phase = getPhase(currentWeek);
+
+  return `You are an expert electrical engineering mentor designing a personalized weekly project plan.
+
+STUDENT PROFILE:
+- Name: ${name}
+- Current level: ${level.replace('_', ' ')}
+- Available time: ${hours === '3' ? '3-5' : hours === '8' ? '6-10' : '10-20'} hours/week
+- Week: ${currentWeek} of 80
+- Phase: ${phase.phase} - ${phase.name}
+- Long-term goals: ${goals}
+- Phase focus topics: ${phase.topics}
+
+RESPONSE FORMAT: Return a JSON object (no markdown, no backticks) with this structure:
+{
+  "week_title": "Short catchy title for this week's theme",
+  "week_objective": "One sentence learning goal",
+  "project_name": "Name of the main project",
+  "difficulty": "Beginner/Intermediate/Advanced",
+  "estimated_hours": number,
+  "days": [
+    {
+      "day": "Monday",
+      "focus": "Short focus area",
+      "tasks": ["task 1", "task 2"],
+      "resource": "Specific resource or tool to use"
+    }
+  ],
+  "deliverables": ["What you'll have built by end of week"],
+  "skills_gained": ["skill1", "skill2"],
+  "next_week_preview": "One sentence about what comes next",
+  "tools_needed": ["tool1", "tool2"]
+}
+
+Include 5 days (Mon–Fri). Make tasks very concrete and actionable. Keep beginner-friendly for Phase 1. Scale difficulty as weeks progress. Reference real tools like Falstad, LTspice, Logisim, ModelSim, Vivado, Cadence depending on phase.`;
+}
+
+async function generatePlan() {
+  const btn = document.getElementById('gen-btn');
+  const output = document.getElementById('output');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span> Generating`;
+  output.className = 'output-area';
+  output.innerHTML = `<span class="placeholder loading-dots">Designing week ${currentWeek} plan<span>.</span><span>.</span><span>.</span></span>`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: buildSystemPrompt(),
+        messages: [{ role: 'user', content: `Generate the week ${currentWeek} project plan.` }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.map(c => c.text || '').join('') || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+
+    let plan;
+    try { plan = JSON.parse(clean); } catch(e) {
+      output.className = 'output-area has-content';
+      output.innerHTML = `<span style="color:var(--red)">Parse error — raw response:</span><br><pre style="white-space:pre-wrap;font-size:11px;margin-top:8px;">${raw}</pre>`;
+      return;
+    }
+
+    lastPlanStructured = plan;
+    lastPlanText = raw;
+    renderPlan(plan, output);
+    document.getElementById('export-row').style.display = 'flex';
+
+  } catch(err) {
+    output.className = 'output-area has-content';
+    output.innerHTML = `<span style="color:var(--red)">Error: ${err.message}</span>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate Week`;
+  }
+}
+
+function renderPlan(plan, container) {
+  container.className = 'output-area has-content';
+  let html = `
+    <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+      <div style="font-size:16px;font-weight:600;color:var(--teal-light);margin-bottom:4px;">${plan.week_title}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">${plan.week_objective}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="background:rgba(29,158,117,0.15);border:1px solid var(--teal-dim);border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--teal-light);padding:2px 8px;">📦 ${plan.project_name}</span>
+        <span style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--text2);padding:2px 8px;">⏱ ~${plan.estimated_hours}h</span>
+        <span style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--text2);padding:2px 8px;">🎯 ${plan.difficulty}</span>
+      </div>
+    </div>
+    <div class="week-plan">`;
+
+  (plan.days || []).forEach(day => {
+    html += `<div class="day-block">
+      <h3>${day.day} · ${day.focus}</h3>
+      ${(day.tasks || []).map(t => `<div class="task"><span class="task-bullet">›</span><span class="task-text">${t}</span></div>`).join('')}
+      ${day.resource ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);font-family:var(--mono)">🔧 ${day.resource}</div>` : ''}
+    </div>`;
+  });
+
+  html += `</div>`;
+
+  if (plan.deliverables?.length) {
+    html += `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:6px;">DELIVERABLES</div>
+      ${plan.deliverables.map(d => `<div style="font-size:12px;color:var(--text);margin-bottom:3px;">✓ ${d}</div>`).join('')}
+    </div>`;
+  }
+
+  if (plan.next_week_preview) {
+    html += `<div style="margin-top:10px;padding:8px 10px;background:rgba(239,159,39,0.08);border:1px solid var(--amber-dim);border-radius:6px;font-size:11px;color:var(--amber);">
+      ▶ Next week: ${plan.next_week_preview}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function exportCalendar() {
+  if (!lastPlanStructured) return;
+  const plan = lastPlanStructured;
+  const name = document.getElementById('p-name').value || 'Student';
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - startDate.getDay() + 1);
+
+  let ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//EE Planner//EN\r\nCALSCALE:GREGORIAN\r\n`;
+
+  const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  (plan.days || []).forEach((day, i) => {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    const ds = d.toISOString().split('T')[0].replace(/-/g,'');
+    const uid = `ee-week${currentWeek}-day${i}@planner`;
+    const summary = `[EE W${currentWeek}] ${day.day}: ${day.focus}`;
+    const desc = (day.tasks || []).join(' | ') + (day.resource ? ` | Tool: ${day.resource}` : '');
+
+    ics += `BEGIN:VEVENT\r\nUID:${uid}\r\nDTSTART;VALUE=DATE:${ds}\r\nDTEND;VALUE=DATE:${ds}\r\nSUMMARY:${summary}\r\nDESCRIPTION:${desc.replace(/,/g,'\\,')}\r\nEND:VEVENT\r\n`;
+  });
+
+  ics += `END:VCALENDAR`;
+
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `EE_Week${currentWeek}_Plan.ics`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('✓ Calendar file downloaded — import into Google Calendar');
+}
+
+function exportDocs() {
+  if (!lastPlanStructured) return;
+  const plan = lastPlanStructured;
+  const name = document.getElementById('p-name').value || 'Student';
+  const phase = getPhase(currentWeek);
+
+  let doc = `EE LEARNING PLAN — WEEK ${currentWeek}\n`;
+  doc += `Student: ${name} | Phase ${phase.phase}: ${phase.name}\n`;
+  doc += `${'='.repeat(60)}\n\n`;
+  doc += `PROJECT: ${plan.project_name}\n`;
+  doc += `Objective: ${plan.week_objective}\n`;
+  doc += `Estimated time: ~${plan.estimated_hours} hours | Difficulty: ${plan.difficulty}\n\n`;
+  doc += `WEEKLY SCHEDULE\n${'─'.repeat(40)}\n`;
+
+  (plan.days || []).forEach(day => {
+    doc += `\n${day.day.toUpperCase()} — ${day.focus}\n`;
+    (day.tasks || []).forEach(t => doc += `  • ${t}\n`);
+    if (day.resource) doc += `  🔧 Resource: ${day.resource}\n`;
+  });
+
+  if (plan.deliverables?.length) {
+    doc += `\nDELIVERABLES BY END OF WEEK\n${'─'.repeat(40)}\n`;
+    plan.deliverables.forEach(d => doc += `✓ ${d}\n`);
+  }
+
+  if (plan.skills_gained?.length) {
+    doc += `\nSKILLS GAINED\n${'─'.repeat(40)}\n`;
+    plan.skills_gained.forEach(s => doc += `• ${s}\n`);
+  }
+
+  if (plan.tools_needed?.length) {
+    doc += `\nTOOLS NEEDED\n${'─'.repeat(40)}\n`;
+    plan.tools_needed.forEach(t => doc += `• ${t}\n`);
+  }
+
+  if (plan.next_week_preview) {
+    doc += `\nNEXT WEEK PREVIEW\n${'─'.repeat(40)}\n${plan.next_week_preview}\n`;
+  }
+
+  doc += `\n${'='.repeat(60)}\nGenerated by EE Learning Planner | Path to VLSI & CMOS\n`;
+
+  navigator.clipboard.writeText(doc).then(() => {
+    showToast('✓ Copied! Paste into Google Docs (Ctrl+V)');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = doc; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('✓ Copied! Paste into Google Docs (Ctrl+V)');
+  });
+}
+
+function copyContext() {
+  const name = document.getElementById('p-name').value || 'Student';
+  const level = document.getElementById('p-level').value;
+  const hours = document.getElementById('p-hours').value;
+  const goals = document.getElementById('p-goals').value;
+  const phase = getPhase(currentWeek);
+
+  const ctx = `## My EE Learning Context
+
+**Student:** ${name}
+**Current level:** ${level.replace('_', ' ')}
+**Available time:** ${hours === '3' ? '3-5' : hours === '8' ? '6-10' : '10-20'} hours/week
+**Current week:** ${currentWeek} of 80
+**Current phase:** Phase ${phase.phase} — ${phase.name}
+**Phase topics:** ${phase.topics}
+**Long-term goals:** ${goals}
+
+**Learning path:** Beginner EE → Digital Logic → Verilog/VHDL → FPGA → VLSI → CMOS design
+
+Use this context to give me personalized help, answer questions at the right level, and suggest projects aligned with my current phase.`;
+
+  navigator.clipboard.writeText(ctx).then(() => {
+    showToast('✓ AI context copied — paste into any AI chat!');
+  });
+}
+
+document.getElementById('display-week').textContent = currentWeek;
+</script>
+</body>
+</html>
