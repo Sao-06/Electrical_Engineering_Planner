@@ -13,10 +13,8 @@
 - **Progress:** Completed. Built full CMOS inverter DC analysis in Python (Jupyter notebook). Modeled NMOS/PMOS IV characteristics using Shockley long-channel model with channel-length modulation. Constructed VTC via bisection method (current balancing). Extracted switching threshold Vm, noise margins NM_H and NM_L, and identified all five operating regions. Ran sensitivity analysis on kp/kn ratio and visualized its effect on Vm symmetry. All plots saved as PNG under `Week_01_CMOS_Inverter/figures/`. Technical summary written and saved as `Week01_Technical_Summary.md`.
 - **Blockers:** None
 - **Time spent:** ~6 hours (estimated 3 hours)
-- **Key takeaways:** NMOS enters saturation before linear because Vds = Vout ≈ Vdd when it first turns on; PMOS and NMOS have complementary Vin responses creating push-pull Vout behavior; VTC is fundamentally an analog function despite digital abstraction; noise margins define the reliable switching window; hole mobility causes PMOS to have lower transconductance than NMOS.
+- **Key takeaways:** NMOS enters saturation before linear because Vds = Vout ≈ Vdd when it first turns on; PMOS and NMOS have complementary Vin responses creating push-pull Vout behavior; VTC is fundamentally an analog function despite digital abstraction; noise margins define the reliable switching window; hole mobility causes PMOS to have lower transconductance than NMOS; Python simulation is valuable for building intuition directly from equations, but SPICE tools (LTspice/ngspice) are the practical standard for realistic circuit simulation — learning SPICE is a key next step.
 - **Deliverables:** `cmos_inverter_vtc.ipynb`, 6 PNG figures, `Week01_Technical_Summary.md`
-- **Summary updates:**
-  - Added "Python Simulation vs Industry Tools" section to technical summary: Python simulation is valuable for building intuition from first-principles math; LTspice/SPICE tools are faster and more realistic for design work; goal is to learn SPICE tools in future weeks.
 - **Next action:** Begin Week 2 — CMOS Inverter Transient Analysis and Power Dissipation on April 11
 
 ---

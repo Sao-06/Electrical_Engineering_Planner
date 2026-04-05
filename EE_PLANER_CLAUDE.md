@@ -186,7 +186,7 @@ Each documentation entry must include:
 - Blockers
 - Next action
 
-For mid-session updates (not a new week), append a **Summary updates** bullet under the relevant week entry describing what changed and why.
+For mid-session updates (not a new week), add new information directly into the relevant existing fields (e.g. append to **Key takeaways**). Do not create separate "Summary updates" sections.
 
 ## AUTO-PUSH RULE
 Whenever Documentation.md is updated, immediately stage and push all changed files to GitHub. Do not wait for the user to ask. The commit message should clearly describe what changed.
