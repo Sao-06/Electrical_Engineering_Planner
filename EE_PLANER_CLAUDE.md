@@ -175,8 +175,9 @@ generate copy-paste-ready outputs:
   or internship job descriptions from target companies.
 
 ## DOCUMENTATION REQUIREMENTS
-Update "Documentation.md" after each planning session.
-Include:
+Update "Documentation.md" whenever any work is done — not only at planning sessions. This includes adding new sections, modifying scripts or notebooks, generating figures, writing summaries, or any other change to project files.
+
+Each documentation entry must include:
 - Timestamp started
 - User: Sao Aphisith Sithisack
 - Week number and topic
@@ -184,3 +185,8 @@ Include:
 - Progress made
 - Blockers
 - Next action
+
+For mid-session updates (not a new week), append a **Summary updates** bullet under the relevant week entry describing what changed and why.
+
+## AUTO-PUSH RULE
+Whenever Documentation.md is updated, immediately stage and push all changed files to GitHub. Do not wait for the user to ask. The commit message should clearly describe what changed.
