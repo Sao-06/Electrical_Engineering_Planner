@@ -1,4 +1,4 @@
-# EE Internship Skills - Documentation Log
+# EE VLSI/Hardware Engineering Project - Documentation Log
 
 ---
 
