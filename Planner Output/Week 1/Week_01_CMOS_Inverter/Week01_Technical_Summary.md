@@ -76,6 +76,16 @@ These assumptions keep the model tractable and analytically solvable. They are r
 
 ---
 
+## Python Simulation vs Industry Tools
+
+Simulating CMOS circuits in Python — deriving currents from the Shockley equations and solving for Vout numerically — is valuable precisely because it forces engagement with the underlying math. Every plot is the direct output of a formula, making the connection between theory and result explicit.
+
+Industry simulation tools like LTspice take a different approach: you draw the schematic, assign SPICE model parameters, and the solver handles the numerics automatically. This is far faster for design iteration and handles effects (parasitics, temperature variation, non-ideal models) that a hand-written script would require enormous effort to replicate. In a real workspace, writing Python to simulate a full circuit from scratch would be impractical.
+
+The right takeaway is that both approaches are complementary: Python for building intuition and verifying understanding of fundamental equations; SPICE tools for realistic circuit simulation and design work. Learning LTspice or ngspice is a natural next step to bridge from conceptual understanding to professional-grade simulation.
+
+---
+
 ## Reflection on AI-Assisted Learning
 
 Estimated time: ~3 hours. Actual time: 6+ hours.
