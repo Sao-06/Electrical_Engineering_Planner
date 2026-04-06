@@ -1,71 +1,45 @@
-# Electrical Engineering Internship Skills Planner
+# EE VLSI/Hardware Engineering Project
 
-A structured, semester-long weekly project plan for building hands-on electrical engineering skills relevant to IC design, photonics, and semiconductor internships at companies like NVIDIA, TSMC, Apple, IBM, ARM, ASML, and Lumentum.
+A semester-long weekly project plan building hands-on IC design, VLSI, and hardware engineering skills.
 
-## Overview
+**Student:** Sao Aphisith Sithisack — Sophomore EE, focused on IC design, VLSI, and hardware engineering.
 
-This planner generates progressive weekly mini-projects (2-3 hours each) that build demonstrable, portfolio-ready skills across core EE domains:
-
-- **IC Design & VLSI** - CMOS circuits, layout, simulation
-- **Semiconductor Physics & Nanoelectronics** - Device modeling, FinFETs
-- **Photonics & Opto-electronics** - Ring resonators, waveguides
-- **Digital Design & Verification** - RTL, testbenches, synthesis
-- **Mixed-Signal & RF** - ADCs, PLLs, amplifiers
-
-Each week includes step-by-step instructions, Python simulation scripts, expected results, and deliverables suitable for a technical portfolio.
+---
 
 ## Repository Structure
 
 ```
-├── EE_PLANER_CLAUDE.md          # AI agent prompt / planner specification
-├── Documentation.md             # Progress log tracking weekly completion
-├── Planner Output/
-│   ├── Week 1/
-│   │   ├── Week_01_CMOS_Inverter_Fundamentals.md   # Full project plan
-│   │   ├── scripts/                                 # Python simulation scripts
-│   │   │   ├── vtc_curve.py
-│   │   │   ├── gain_plot.py
-│   │   │   ├── noise_margins.py
-│   │   │   └── power_dissipation.py
-│   │   └── figures/                                 # Generated plots
-│   │       ├── vtc_curve.png
-│   │       ├── gain_plot.png
-│   │       ├── noise_margins.png
-│   │       └── power_dissipation.png
-│   └── Week 2/
-│       └── Week_02_CMOS_Inverter_Transient_and_Power.md
-└── README.md
+├── EE_PLANER_CLAUDE.md              # AI planner rules and agent prompt
+├── Documentation.md                 # Weekly progress log
+└── Planner Output/
+    └── Week N/
+        ├── CLaude_Guidelines/       # Claude-generated scripts and figures
+        └── Week_NN_<Topic>/         # Student's notebooks, figures, and summaries
 ```
+
+> Claude-generated files go in `CLaude_Guidelines/`. Student work goes in `Week_NN_<Topic>/`.
+
+---
 
 ## Weekly Progress
 
-| Week | Topic | Status |
-|------|-------|--------|
-| 1 | CMOS Inverter DC Analysis & VTC Modeling | Planned |
-| 2 | CMOS Inverter Transient Response & Power Dissipation | Planned |
-| 3-16 | Coming soon | - |
+| Week | Topic | Tools | Key Takeaways | Status |
+|------|-------|-------|---------------|--------|
+| 1 | CMOS Inverter DC Analysis & VTC Modeling | Python, Jupyter | NMOS/PMOS operating regions, VTC is analog, noise margins, hole vs electron mobility | Completed 2026-04-05 |
+| 2 | CMOS Inverter Transient Response & Power Dissipation | Python, Jupyter | Propagation delay, dynamic/static power, delay-capacitance tradeoff | Planned 2026-04-11 |
+| 3–16 | Coming soon | — | — | — |
 
-## Tools Used
+---
 
-- **Python** (NumPy, Matplotlib) - Circuit modeling and simulation
-- **MATLAB** - Analysis and visualization
-- **Vivado** - Digital design and FPGA synthesis
-- **KiCad** - Schematic capture and PCB layout
+## Tools
 
-## Getting Started
+- **Python** (NumPy, Matplotlib) — simulation from first principles
+- **Jupyter Notebook** — interactive analysis
+- **Vivado** — digital design and FPGA synthesis
+- **KiCad** — schematic capture
+- **LTspice / ngspice** — planned for future weeks
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/Electrical-Engineering-Planner.git
-   ```
-2. Install Python dependencies:
-   ```bash
-   pip install numpy matplotlib
-   ```
-3. Run any week's scripts from the `Planner Output/Week N/scripts/` directory:
-   ```bash
-   python vtc_curve.py
-   ```
+---
 
 ## License
 
