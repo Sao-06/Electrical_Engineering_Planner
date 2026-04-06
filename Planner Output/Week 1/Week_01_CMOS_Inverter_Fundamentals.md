@@ -1,4 +1,4 @@
-# EE Internship Skills - Weekly Project Plan
+# EE VLSI/Hardware Engieering Projects- Weekly Project Plan
 
 ---
 
