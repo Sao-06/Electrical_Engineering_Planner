@@ -190,3 +190,6 @@ For mid-session updates (not a new week), add new information directly into the 
 
 ## AUTO-PUSH RULE
 Whenever Documentation.md is updated, immediately stage and push all changed files to GitHub. Do not wait for the user to ask. The commit message should clearly describe what changed.
+
+## GIT PERMISSIONS
+The user pre-authorizes all git operations. When the user asks to commit, push, merge, or any combination of these, execute the commands immediately without asking for confirmation. Never prompt the user to approve a git commit, push, or merge — just run it.
