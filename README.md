@@ -35,9 +35,13 @@ A semester-long weekly project plan building hands-on IC design, VLSI, and hardw
 
 - **Python** (NumPy, Matplotlib) — simulation from first principles
 - **Jupyter Notebook** — interactive analysis
+- **Verilog / SystemVerilog / VHDL** — RTL design and verification
 - **Vivado** — digital design and FPGA synthesis
 - **KiCad** — schematic capture
-- **LTspice / ngspice** — planned for future weeks
+- **LTspice / ngspice** — SPICE simulation
+- **Cadence Virtuoso** — analog/mixed-signal IC design and layout
+- **Synopsys Design Compiler** — logic synthesis and timing analysis
+- **Magic VLSI / OpenROAD** — open-source physical design and layout
 
 ---
 
